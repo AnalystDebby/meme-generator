@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export const Meme = () => {
   const [meme, setMeme] = useState({
@@ -8,34 +8,29 @@ export const Meme = () => {
     randomImage: "http://i.imgflip.com/1bij.jpg",
     memes: [],
   });
+  const topTextRef = useRef(null);
+  const bottomTextRef = useRef(null);
 
   useEffect(() => {
     fetch("https://api.imgflip.com/get_memes")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "vvvvvv");
         setMeme((prev) => ({ ...prev, memes: data.data.memes }));
       });
   }, []);
 
-  function getMemeImage(event) {
+  function getMemeImage(e) {
+    e.preventDefault();
     const randomNumber = Math.floor(Math.random() * meme.memes.length);
     const url = meme.memes[randomNumber].url;
     setMeme((prev) => ({
       ...prev,
-      topText: event.target.value,
-      bottomText: event.target.value,
+      topText: topTextRef.current.value,
+      bottomText: bottomTextRef.current.value,
       randomImage: url,
     }));
   }
 
-  function handleChange(event) {
-    const { name, value } = event.target;
-    setMeme((prevMeme) => ({
-      ...prevMeme,
-      [name]: value,
-    }));
-  }
   return (
     <main className="w-full  relative p-10">
       <form className="w-full flex flex-col md:grid md:grid-cols-2 md:grid-rows-2 gap-10 text-center">
@@ -44,8 +39,7 @@ export const Meme = () => {
             type="text"
             placeholder="Top text"
             name="topText"
-            value={meme.topText}
-            onChange={handleChange}
+            ref={topTextRef}
             className="indent-3 rounded-md border-solid border-2 border-gray-400 focus:outline-none"
           />
         </div>
@@ -54,8 +48,7 @@ export const Meme = () => {
             type="text"
             placeholder="Bottom text"
             name="bottomText"
-            value={meme.bottomText}
-            onChange={handleChange}
+            ref={bottomTextRef}
             className="indent-3 rounded-md border-solid border-2 border-gray-400 focus:outline-none"
           />
         </div>
@@ -89,3 +82,5 @@ export const Meme = () => {
     </main>
   );
 };
+
+//
